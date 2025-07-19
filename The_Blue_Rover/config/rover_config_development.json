@@ -1,0 +1,36 @@
+{
+  "environment": "development",
+  "debug_mode": true,
+  "auto_start_services": false,
+  "camera": {
+    "enabled": true,
+    "port": 8081,
+    "resolution_width": 320,
+    "resolution_height": 240,
+    "framerate": 15,
+    "quality": 70
+  },
+  "control": {
+    "max_speed": 50,
+    "steering_range": 25
+  },
+  "battery": {
+    "check_interval": 10,
+    "enable_alerts": false
+  },
+  "logging": {
+    "level": "DEBUG",
+    "log_to_file": true,
+    "log_file_path": "logs/rover_dev.log",
+    "enable_telemetry": true
+  },
+  "network": {
+    "ssh_port": 2222,
+    "web_interface_port": 8001,
+    "connection_timeout": 10
+  },
+  "hardware": {
+    "enable_hardware": false,
+    "mock_hardware": true
+  }
+}

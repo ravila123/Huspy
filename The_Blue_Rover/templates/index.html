@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blue Rover Control Interface</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .status-bar {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+
+        .status-item {
+            text-align: center;
+            margin: 5px;
+        }
+
+        .status-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .status-connected {
+            color: #4CAF50;
+        }
+
+        .status-disconnected {
+            color: #f44336;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .panel h2 {
+            margin-bottom: 15px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .camera-panel {
+            text-align: center;
+        }
+
+        .camera-stream {
+            width: 100%;
+            max-width: 640px;
+            height: auto;
+            border-radius: 10px;
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        .camera-controls {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .control-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .control-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .control-section h3 {
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .control-buttons.movement {
+            grid-template-areas: 
+                ". forward ."
+                "left stop right"
+                ". backward .";
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.stop {
+            background: linear-gradient(145deg, #f44336, #da190b);
+        }
+
+        .btn.camera {
+            background: linear-gradient(145deg, #2196F3, #1976D2);
+        }
+
+        .btn.snapshot {
+            background: linear-gradient(145deg, #FF9800, #F57C00);
+        }
+
+        .btn-forward { grid-area: forward; }
+        .btn-left { grid-area: left; }
+        .btn-stop { grid-area: stop; }
+        .btn-right { grid-area: right; }
+        .btn-backward { grid-area: backward; }
+
+        .slider-control {
+            margin: 10px 0;
+        }
+
+        .slider-control label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.3);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+            border: none;
+        }
+
+        .logs-section {
+            grid-column: 1 / -1;
+            margin-top: 20px;
+        }
+
+        .log-viewer {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .log-controls {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .log-select {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 14px;
+        }
+
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .message.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .message.success {
+            background: #4CAF50;
+        }
+
+        .message.error {
+            background: #f44336;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-bar {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .control-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .control-buttons.movement {
+                grid-template-areas: 
+                    "forward forward"
+                    "left right"
+                    "stop backward";
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Blue Rover Control Interface</h1>
+            <p>Remote control and monitoring dashboard</p>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div>Connection</div>
+                <div class="status-value" id="connection-status">Connecting...</div>
+            </div>
+            <div class="status-item">
+                <div>Battery</div>
+                <div class="status-value" id="battery-status">--.-V</div>
+            </div>
+            <div class="status-item">
+                <div>Camera</div>
+                <div class="status-value" id="camera-status">Unknown</div>
+            </div>
+            <div class="status-item">
+                <div>Last Update</div>
+                <div class="status-value" id="last-update">--:--:--</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="panel camera-panel">
+                <h2>📹 Camera Stream</h2>
+                <img id="camera-stream" class="camera-stream" 
+                     src="http://localhost:8080/stream.mjpg" 
+                     alt="Camera Stream" 
+                     onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjQwIiBoZWlnaHQ9IjQ4MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjY2NjIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxOCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkNhbWVyYSBOb3QgQXZhaWxhYmxlPC90ZXh0Pjwvc3ZnPg=='">
+                
+                <div class="camera-controls">
+                    <button class="btn camera" onclick="takePicture()">📸 Snapshot</button>
+                </div>
+
+                <div class="control-section">
+                    <h3>Camera Position</h3>
+                    <div class="slider-control">
+                        <label for="camera-pan">Pan: <span id="pan-value">0</span>°</label>
+                        <input type="range" id="camera-pan" class="slider" min="-35" max="35" value="0" 
+                               oninput="updateCameraPan(this.value)">
+                    </div>
+                    <div class="slider-control">
+                        <label for="camera-tilt">Tilt: <span id="tilt-value">0</span>°</label>
+                        <input type="range" id="camera-tilt" class="slider" min="-35" max="35" value="0" 
+                               oninput="updateCameraTilt(this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel control-panel">
+                <h2>🎮 Rover Control</h2>
+                
+                <div class="control-section">
+                    <h3>Movement</h3>
+                    <div class="control-buttons movement">
+                        <button class="btn btn-forward" onmousedown="startMovement('forward')" onmouseup="stopMovement()">⬆️ Forward</button>
+                        <button class="btn btn-left" onmousedown="startSteering('left')" onmouseup="stopSteering()">⬅️ Left</button>
+                        <button class="btn btn-stop stop" onclick="emergencyStop()">🛑 STOP</button>
+                        <button class="btn btn-right" onmousedown="startSteering('right')" onmouseup="stopSteering()">➡️ Right</button>
+                        <button class="btn btn-backward" onmousedown="startMovement('backward')" onmouseup="stopMovement()">⬇️ Backward</button>
+                    </div>
+                    
+                    <div class="slider-control">
+                        <label for="speed-control">Speed: <span id="speed-value">50</span>%</label>
+                        <input type="range" id="speed-control" class="slider" min="0" max="100" value="50">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel logs-section">
+            <h2>📋 System Logs</h2>
+            <div class="log-controls">
+                <select id="log-select" class="log-select" onchange="loadLogFile()">
+                    <option value="">Select log file...</option>
+                </select>
+                <button class="btn" onclick="refreshLogs()">🔄 Refresh</button>
+                <button class="btn" onclick="downloadCurrentLog()">💾 Download</button>
+            </div>
+            <div id="log-viewer" class="log-viewer">
+                Select a log file to view its contents...
+            </div>
+        </div>
+    </div>
+
+    <div id="message" class="message"></div>
+
+    <script>
+        // WebSocket connection
+        const socket = io();
+        let currentSpeed = 50;
+        let isMoving = false;
+        let isSteering = false;
+
+        // Connection status
+        socket.on('connect', function() {
+            updateConnectionStatus('Connected', true);
+            showMessage('Connected to rover', 'success');
+        });
+
+        socket.on('disconnect', function() {
+            updateConnectionStatus('Disconnected', false);
+            showMessage('Disconnected from rover', 'error');
+        });
+
+        // Status updates
+        socket.on('status_update', function(data) {
+            updateSystemStatus(data);
+        });
+
+        socket.on('command_result', function(data) {
+            if (data.error) {
+                showMessage('Error: ' + data.error, 'error');
+            } else if (data.action) {
+                showMessage(data.action, 'success');
+            }
+        });
+
+        // Update system status display
+        function updateSystemStatus(status) {
+            document.getElementById('battery-status').textContent = status.battery_voltage.toFixed(1) + 'V';
+            document.getElementById('camera-status').textContent = status.camera_active ? 'Active' : 'Inactive';
+            
+            const lastUpdate = new Date(status.last_update);
+            document.getElementById('last-update').textContent = lastUpdate.toLocaleTimeString();
+            
+            // Update battery status color
+            const batteryElement = document.getElementById('battery-status');
+            if (status.battery_voltage < 6.0) {
+                batteryElement.className = 'status-value status-disconnected';
+            } else if (status.battery_voltage < 6.5) {
+                batteryElement.className = 'status-value';
+                batteryElement.style.color = '#FF9800';
+            } else {
+                batteryElement.className = 'status-value status-connected';
+            }
+        }
+
+        function updateConnectionStatus(status, connected) {
+            const element = document.getElementById('connection-status');
+            element.textContent = status;
+            element.className = connected ? 'status-value status-connected' : 'status-value status-disconnected';
+        }
+
+        // Movement controls
+        function startMovement(direction) {
+            if (isMoving) return;
+            isMoving = true;
+            currentSpeed = parseInt(document.getElementById('speed-control').value);
+            
+            const command = direction === 'forward' ? 'move_forward' : 'move_backward';
+            socket.emit('rover_command', {
+                command: command,
+                value: currentSpeed
+            });
+        }
+
+        function stopMovement() {
+            if (!isMoving) return;
+            isMoving = false;
+            socket.emit('rover_command', {
+                command: 'stop'
+            });
+        }
+
+        function startSteering(direction) {
+            if (isSteering) return;
+            isSteering = true;
+            
+            const angle = direction === 'left' ? -35 : 35;
+            socket.emit('rover_command', {
+                command: 'steer',
+                value: angle
+            });
+        }
+
+        function stopSteering() {
+            if (!isSteering) return;
+            isSteering = false;
+            socket.emit('rover_command', {
+                command: 'steer',
+                value: 0
+            });
+        }
+
+        function emergencyStop() {
+            isMoving = false;
+            isSteering = false;
+            socket.emit('rover_command', {
+                command: 'stop'
+            });
+        }
+
+        // Camera controls
+        function updateCameraPan(value) {
+            document.getElementById('pan-value').textContent = value;
+            socket.emit('rover_command', {
+                command: 'camera_pan',
+                value: parseInt(value)
+            });
+        }
+
+        function updateCameraTilt(value) {
+            document.getElementById('tilt-value').textContent = value;
+            socket.emit('rover_command', {
+                command: 'camera_tilt',
+                value: parseInt(value)
+            });
+        }
+
+        function takePicture() {
+            fetch('/api/snapshot', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showMessage('Snapshot saved: ' + data.filename, 'success');
+                } else {
+                    showMessage('Snapshot failed: ' + data.error, 'error');
+                }
+            })
+            .catch(error => {
+                showMessage('Snapshot error: ' + error, 'error');
+            });
+        }
+
+        // Speed control
+        document.getElementById('speed-control').oninput = function() {
+            document.getElementById('speed-value').textContent = this.value;
+        };
+
+        // Log management
+        function refreshLogs() {
+            fetch('/api/logs')
+            .then(response => response.json())
+            .then(data => {
+                const select = document.getElementById('log-select');
+                select.innerHTML = '<option value="">Select log file...</option>';
+                
+                data.logs.forEach(log => {
+                    const option = document.createElement('option');
+                    option.value = log.name;
+                    option.textContent = `${log.name} (${(log.size / 1024).toFixed(1)}KB)`;
+                    select.appendChild(option);
+                });
+                
+                showMessage('Log list refreshed', 'success');
+            })
+            .catch(error => {
+                showMessage('Error loading logs: ' + error, 'error');
+            });
+        }
+
+        function loadLogFile() {
+            const select = document.getElementById('log-select');
+            const filename = select.value;
+            
+            if (!filename) {
+                document.getElementById('log-viewer').textContent = 'Select a log file to view its contents...';
+                return;
+            }
+            
+            fetch(`/api/logs/${filename}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('log-viewer').textContent = 'Error: ' + data.error;
+                } else {
+                    document.getElementById('log-viewer').textContent = data.content;
+                    // Scroll to bottom
+                    const viewer = document.getElementById('log-viewer');
+                    viewer.scrollTop = viewer.scrollHeight;
+                }
+            })
+            .catch(error => {
+                document.getElementById('log-viewer').textContent = 'Error loading log: ' + error;
+            });
+        }
+
+        function downloadCurrentLog() {
+            const select = document.getElementById('log-select');
+            const filename = select.value;
+            
+            if (!filename) {
+                showMessage('Please select a log file first', 'error');
+                return;
+            }
+            
+            window.open(`/api/logs/${filename}/download`, '_blank');
+        }
+
+        // Message display
+        function showMessage(text, type) {
+            const message = document.getElementById('message');
+            message.textContent = text;
+            message.className = `message ${type} show`;
+            
+            setTimeout(() => {
+                message.classList.remove('show');
+            }, 3000);
+        }
+
+        // Keyboard controls
+        document.addEventListener('keydown', function(event) {
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT') return;
+            
+            switch(event.key.toLowerCase()) {
+                case 'w':
+                    if (!isMoving) startMovement('forward');
+                    break;
+                case 's':
+                    if (!isMoving) startMovement('backward');
+                    break;
+                case 'a':
+                    if (!isSteering) startSteering('left');
+                    break;
+                case 'd':
+                    if (!isSteering) startSteering('right');
+                    break;
+                case 'x':
+                case ' ':
+                    emergencyStop();
+                    break;
+                case 't':
+                    takePicture();
+                    break;
+            }
+        });
+
+        document.addEventListener('keyup', function(event) {
+            if (event.target.tagName === 'INPUT' || event.target.tagName === 'SELECT') return;
+            
+            switch(event.key.toLowerCase()) {
+                case 'w':
+                case 's':
+                    stopMovement();
+                    break;
+                case 'a':
+                case 'd':
+                    stopSteering();
+                    break;
+            }
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            refreshLogs();
+            
+            // Update camera stream URL with current host
+            const cameraStream = document.getElementById('camera-stream');
+            const currentHost = window.location.hostname;
+            cameraStream.src = `http://${currentHost}:8080/stream.mjpg`;
+        });
+    </script>
+</body>
+</html>

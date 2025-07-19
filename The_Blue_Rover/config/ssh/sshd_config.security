@@ -1,0 +1,50 @@
+# SSH Security Configuration Template for Blue Rover
+# This file contains recommended security settings for SSH daemon
+# These settings will be applied by the setup_ssh.sh script
+
+# Authentication settings
+PubkeyAuthentication yes
+PasswordAuthentication no
+PermitRootLogin no
+PermitEmptyPasswords no
+ChallengeResponseAuthentication no
+
+# Protocol and encryption
+Protocol 2
+
+# Connection settings
+ClientAliveInterval 300
+ClientAliveCountMax 2
+MaxAuthTries 3
+MaxSessions 2
+
+# Logging
+SyslogFacility AUTH
+LogLevel INFO
+
+# Additional security options (uncomment to enable)
+# AllowUsers your-username
+# DenyUsers root
+# AllowGroups ssh-users
+# Banner /etc/ssh/banner.txt
+
+# Custom port (uncomment and modify as needed)
+# Port 2222
+
+# Disable unused authentication methods
+KerberosAuthentication no
+GSSAPIAuthentication no
+UsePAM yes
+
+# File transfer settings
+Subsystem sftp /usr/lib/openssh/sftp-server
+
+# Network settings
+AddressFamily inet
+ListenAddress 0.0.0.0
+
+# Security hardening
+PermitUserEnvironment no
+StrictModes yes
+IgnoreRhosts yes
+HostbasedAuthentication no

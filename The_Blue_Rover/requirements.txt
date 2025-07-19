@@ -1,0 +1,12 @@
+picarx==0.0.3
+Vilib==0.0.2
+readchar==4.*
+pydualsense==2.*
+bleak==0.22.*
+paho-mqtt==1.*
+opencv-python==4.*
+ultralytics==8.*
+PyYAML==6.*
+watchdog==3.*
+Flask==3.*
+Flask-SocketIO==5.*

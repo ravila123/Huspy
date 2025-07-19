@@ -1,0 +1,26 @@
+# SSH Authorized Keys Template for Blue Rover
+# 
+# This file serves as a template for setting up SSH key-based authentication.
+# Replace the example keys below with your actual public keys.
+#
+# To generate a new SSH key pair on your local machine:
+#   ssh-keygen -t ed25519 -C "your-email@example.com"
+#   or
+#   ssh-keygen -t rsa -b 4096 -C "your-email@example.com"
+#
+# Then copy your PUBLIC key (id_ed25519.pub or id_rsa.pub) content here.
+#
+# Example entries (replace with your actual public keys):
+#
+# ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... your-email@example.com
+# ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQ... your-email@example.com
+#
+# Security notes:
+# - Never share your private key (id_ed25519 or id_rsa)
+# - Only add public keys from trusted sources
+# - Each line should contain one complete public key
+# - Lines starting with # are comments and will be ignored
+#
+# After adding your keys, copy this file to ~/.ssh/authorized_keys:
+#   cp config/ssh/authorized_keys.template ~/.ssh/authorized_keys
+#   chmod 600 ~/.ssh/authorized_keys

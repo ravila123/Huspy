@@ -1,0 +1,56 @@
+---
+# Blue Rover Configuration Example (YAML format)
+environment: production
+debug_mode: false
+auto_start_services: true
+
+camera:
+  enabled: true
+  port: 8080
+  resolution_width: 640
+  resolution_height: 480
+  framerate: 30
+  quality: 85
+  flip_horizontal: false
+  flip_vertical: false
+
+control:
+  max_speed: 100
+  steering_range: 35
+  acceleration_rate: 0.8
+  deceleration_rate: 0.9
+  deadzone_threshold: 0.1
+  ps5_controller_timeout: 30
+
+battery:
+  check_interval: 5
+  low_voltage_threshold: 6.5
+  critical_voltage_threshold: 6.0
+  enable_alerts: true
+  shutdown_on_critical: false
+
+logging:
+  level: INFO
+  log_to_file: true
+  log_file_path: logs/rover.log
+  max_log_size_mb: 10
+  backup_count: 5
+  enable_telemetry: true
+
+network:
+  ssh_port: 22
+  web_interface_port: 8000
+  enable_web_interface: true
+  allowed_ssh_users:
+    - pi
+  connection_timeout: 30
+
+hardware:
+  enable_hardware: true
+  mock_hardware: false
+  i2c_bus: 1
+  servo_frequency: 50
+  motor_calibration:
+    left_motor_offset: 0.0
+    right_motor_offset: 0.0
+    steering_center: 0.0

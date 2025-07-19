@@ -1,0 +1,32 @@
+2025-07-18 20:58:19,512 - rover.demo - INFO - Movement: forward - {"action": "forward", "speed": 50, "direction": 0, "duration": 2.0}
+2025-07-18 20:58:20,014 - rover.demo - INFO - Movement: backward - {"action": "backward", "speed": 30, "direction": 0, "duration": 1.5}
+2025-07-18 20:58:20,517 - rover.demo - INFO - Movement: turn_left - {"action": "turn_left", "speed": 40, "direction": -25, "duration": 1.0}
+2025-07-18 20:58:21,023 - rover.demo - INFO - Movement: turn_right - {"action": "turn_right", "speed": 40, "direction": 25, "duration": 1.0}
+2025-07-18 20:58:21,525 - rover.demo - INFO - Movement: stop - {"action": "stop", "speed": 0, "direction": 0, "duration": 0.5}
+2025-07-18 20:58:22,031 - rover.demo - INFO - Battery: 4.1V - {"voltage": 4.1, "percentage": 91.66666666666664}
+2025-07-18 20:58:22,336 - rover.demo - INFO - Battery: 3.8V - {"voltage": 3.8, "percentage": 66.66666666666666}
+2025-07-18 20:58:22,636 - rover.demo - INFO - Battery: 3.5V - {"voltage": 3.5, "percentage": 41.66666666666667}
+2025-07-18 20:58:22,942 - rover.demo - WARNING - Battery: 3.3V - {"voltage": 3.3, "percentage": 24.999999999999986}
+2025-07-18 20:58:23,247 - rover.demo - WARNING - Battery: 3.1V - {"voltage": 3.1, "percentage": 8.333333333333341}
+2025-07-18 20:58:23,549 - rover.demo - WARNING - Battery: 2.9V - {"voltage": 2.9, "percentage": 0}
+2025-07-18 20:58:23,854 - rover.demo - WARNING - Battery: 2.7V - {"voltage": 2.7, "percentage": 0}
+2025-07-18 20:58:24,159 - rover.demo - INFO - System: startup - {"version": "1.2.3", "boot_time": 15.2}
+2025-07-18 20:58:24,365 - rover.demo - INFO - System: wifi_connected - {"ssid": "RoverNet", "signal_strength": -42}
+2025-07-18 20:58:24,566 - rover.demo - INFO - System: camera_initialized - {"resolution": "1080p", "fps": 30}
+2025-07-18 20:58:24,771 - rover.demo - INFO - System: controller_paired - {"type": "PS5", "battery": 85}
+2025-07-18 20:58:24,972 - rover.demo - INFO - System: service_started - {"service": "battery_monitor", "pid": 1234}
+2025-07-18 20:58:25,174 - rover.demo - INFO - Camera: stream_started - {"resolution": "720p", "fps": 30, "bitrate": 2000}
+2025-07-18 20:58:25,175 - rover.demo - INFO - Camera: position_changed - {"pan": 45, "tilt": -10}
+2025-07-18 20:58:25,175 - rover.demo - INFO - Camera: recording_started - {"filename": "rover_session_001.mp4"}
+2025-07-18 20:58:25,175 - rover.demo - INFO - Camera: recording_stopped - {"duration": 120.5, "file_size": "45MB"}
+2025-07-18 20:58:25,175 - rover.demo - INFO - Controller: connected - {"type": "PS5", "battery": 75}
+2025-07-18 20:58:25,175 - rover.demo - INFO - Controller: button_pressed - {"button": "X", "timestamp": 1752897505.175406}
+2025-07-18 20:58:25,175 - rover.demo - INFO - Controller: stick_moved - {"stick": "left", "x": 0.8, "y": -0.3}
+2025-07-18 20:58:25,175 - rover.demo - INFO - Controller: disconnected - {"reason": "low_battery", "session_duration": 1800}
+2025-07-18 20:58:25,175 - rover.demo - ERROR - Error: Hardware connection failed - {"exception_type": "ConnectionError", "exception_message": "PicarX not responding"}
+2025-07-18 20:58:25,175 - rover.demo - ERROR - Error: Camera initialization failed - {"exception_type": "RuntimeError", "exception_message": "Camera module not found"}
+2025-07-18 20:58:25,175 - rover.demo - ERROR - Error: Configuration error - {"exception_type": "ValueError", "exception_message": "Invalid speed value: -150"}
+2025-07-18 20:58:25,175 - rover.demo - INFO - Network: ssh_connection - {"client_ip": "192.168.1.100", "user": "pi"}
+2025-07-18 20:58:25,176 - rover.demo - INFO - Network: web_request - {"endpoint": "/camera/stream", "method": "GET"}
+2025-07-18 20:58:25,176 - rover.demo - INFO - Network: mqtt_message - {"topic": "rover/status", "payload_size": 256}
+2025-07-18 20:58:25,176 - rover.demo - INFO - Network: connection_lost - {"interface": "wlan0", "duration": 5.2}

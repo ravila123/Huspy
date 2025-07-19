@@ -1,0 +1,37 @@
+[Unit]
+Description=Blue Rover Battery Monitoring Service
+Documentation=https://github.com/user/blue-rover
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=%i
+Group=%i
+WorkingDirectory=%h/blue-rover
+Environment=PATH=%h/blue-rover/venv/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=%h/blue-rover/venv/bin/python -m src.battery_monitor --interval 5.0 --low-threshold 6.5 --critical-threshold 6.0
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=blue-rover-battery
+
+# Resource limits
+MemoryMax=128M
+CPUQuota=25%
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/blue-rover/logs
+
+# Failure recovery
+StartLimitInterval=300
+StartLimitBurst=5
+
+[Install]
+WantedBy=default.target

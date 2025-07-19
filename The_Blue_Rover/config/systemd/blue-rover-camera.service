@@ -1,0 +1,38 @@
+[Unit]
+Description=Blue Rover Camera Streaming Service
+Documentation=https://github.com/user/blue-rover
+After=network.target
+Wants=network.target
+
+[Service]
+Type=simple
+User=%i
+Group=%i
+WorkingDirectory=%h/blue-rover
+Environment=PATH=%h/blue-rover/venv/bin:/usr/local/bin:/usr/bin:/bin
+Environment=PYTHONPATH=%h/blue-rover
+ExecStart=%h/blue-rover/venv/bin/python -m src.camera_stream --port 8080
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
+RestartSec=15
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=blue-rover-camera
+
+# Resource limits
+MemoryMax=256M
+CPUQuota=50%
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/blue-rover/logs
+
+# Failure recovery
+StartLimitInterval=300
+StartLimitBurst=3
+
+[Install]
+WantedBy=default.target
