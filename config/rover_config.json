@@ -52,5 +52,30 @@
       "right_motor_offset": 0.0,
       "steering_center": 0.0
     }
+  },
+  "yolo_detection": {
+    "enabled": true,
+    "model_path": "models/yolov5n.pt",
+    "confidence_threshold": 0.5,
+    "nms_threshold": 0.4,
+    "input_size": [640, 640],
+    "target_fps": 10,
+    "enabled_classes": ["person", "car", "bicycle", "dog", "cat"],
+    "device": "cpu",
+    "alerts": {
+      "enabled": true,
+      "alert_classes": ["person", "dog"],
+      "confidence_threshold": 0.7,
+      "rate_limit_seconds": 30,
+      "max_alerts_per_minute": 10
+    },
+    "performance": {
+      "max_cpu_usage": 80,
+      "adaptive_fps": true,
+      "use_hardware_acceleration": true,
+      "max_memory_mb": 1024,
+      "frame_buffer_size": 5,
+      "processing_threads": 2
+    }
   }
 }

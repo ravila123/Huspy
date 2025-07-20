@@ -86,6 +86,34 @@ class HardwareConfig:
 
 
 @dataclass
+class YOLODetectionConfig:
+    """YOLO object detection configuration"""
+    enabled: bool = True
+    model_path: str = "models/yolov5n.pt"
+    confidence_threshold: float = 0.5
+    nms_threshold: float = 0.4
+    input_size: list = field(default_factory=lambda: [640, 640])
+    target_fps: int = 10
+    enabled_classes: list = field(default_factory=lambda: ["person", "car", "bicycle", "dog", "cat"])
+    device: str = "cpu"
+    alerts: Dict[str, Any] = field(default_factory=lambda: {
+        "enabled": True,
+        "alert_classes": ["person", "dog"],
+        "confidence_threshold": 0.7,
+        "rate_limit_seconds": 30,
+        "max_alerts_per_minute": 10
+    })
+    performance: Dict[str, Any] = field(default_factory=lambda: {
+        "max_cpu_usage": 80,
+        "adaptive_fps": True,
+        "use_hardware_acceleration": True,
+        "max_memory_mb": 1024,
+        "frame_buffer_size": 5,
+        "processing_threads": 2
+    })
+
+
+@dataclass
 class RoverConfig:
     """Main rover configuration with all subsystem configs"""
     
@@ -96,6 +124,7 @@ class RoverConfig:
     logging: LoggingConfig = field(default_factory=LoggingConfig)
     network: NetworkConfig = field(default_factory=NetworkConfig)
     hardware: HardwareConfig = field(default_factory=HardwareConfig)
+    yolo_detection: YOLODetectionConfig = field(default_factory=YOLODetectionConfig)
     
     # Global settings
     environment: str = "production"
@@ -154,10 +183,11 @@ class RoverConfig:
         logging_config = LoggingConfig(**data.get('logging', {}))
         network_config = NetworkConfig(**data.get('network', {}))
         hardware_config = HardwareConfig(**data.get('hardware', {}))
+        yolo_detection_config = YOLODetectionConfig(**data.get('yolo_detection', {}))
         
         # Extract global settings
         global_settings = {k: v for k, v in data.items() 
-                          if k not in ['camera', 'control', 'battery', 'logging', 'network', 'hardware']}
+                          if k not in ['camera', 'control', 'battery', 'logging', 'network', 'hardware', 'yolo_detection']}
         
         return cls(
             camera=camera_config,
@@ -166,6 +196,7 @@ class RoverConfig:
             logging=logging_config,
             network=network_config,
             hardware=hardware_config,
+            yolo_detection=yolo_detection_config,
             **global_settings
         )
     
